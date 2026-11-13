@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1419">
+<script>try{var t=localStorage.getItem("daily-routine-theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Daily Routine</title>
+<style>
+:root{
+  --bg:#0f1419; --card:#1a2129; --card2:#222c36; --line:#2d3945;
+  --text:#e8edf2; --muted:#8fa0b0; --accent:#e0a526; --ok:#3fb67a; --warn:#e5604d;
+  --onaccent:#0f1419; --doneBg:#16261f; --doneLine:#235b41; --nowBg:#2a2412; --noteBg:#2a1a18; --navBg:#121920;
+}
+:root[data-theme="light"]{
+  --bg:#f4f6f8; --card:#ffffff; --card2:#e9eef3; --line:#d5dde5;
+  --text:#1a2129; --muted:#5d6e7e; --accent:#a86f00; --ok:#2a9d68; --warn:#cc3f2c;
+  --onaccent:#ffffff; --doneBg:#e3f5ec; --doneLine:#9ad4b6; --nowBg:#fdf1cf; --noteBg:#fbe7e3; --navBg:#ffffff;
+}
+.themebtn{position:absolute;right:16px;top:14px;background:var(--card2);border:1px solid var(--line);
+  border-radius:10px;width:42px;height:42px;font-size:18px;color:var(--text)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Noto Sans Thai","Sarabun",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5}
+body{padding-bottom:84px}
+header{padding:16px 16px 8px;max-width:720px;margin:0 auto}
+h1{font-size:20px;margin:0 0 2px}
+h2{font-size:17px;margin:20px 0 8px;color:var(--accent)}
+h3{font-size:15px;margin:14px 0 6px}
+.sub{color:var(--muted);font-size:14px}
+main{max-width:720px;margin:0 auto;padding:0 16px}
+section{display:none}
+section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.datebar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0}
+.datebar button{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;width:44px;height:44px;font-size:18px}
+.datebar .d{flex:1;text-align:center;font-weight:600}
+.bar{height:10px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:var(--ok);width:0;transition:width .25s}
+.stats{display:flex;gap:10px}
+.stat{flex:1;text-align:center}
+.stat b{display:block;font-size:22px}
+.stat span{font-size:12px;color:var(--muted)}
+.item{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:var(--card);
+  border:1px solid var(--line);margin:8px 0;cursor:pointer;user-select:none}
+.item .box{flex:0 0 26px;height:26px;border-radius:8px;border:2px solid var(--muted);display:flex;
+  align-items:center;justify-content:center;font-size:16px;color:var(--onaccent);margin-top:1px}
+.item.done{background:var(--doneBg);border-color:var(--doneLine)}
+.item.done .box{background:var(--ok);border-color:var(--ok)}
+.item.done .t{color:var(--muted);text-decoration:line-through}
+.item .t{flex:1}
+.item small{display:block;color:var(--muted);font-size:13px;text-decoration:none}
+.tag{font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:0 8px;margin-left:6px;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--muted);font-weight:500;font-size:13px}
+td.tm{white-space:nowrap;color:var(--accent);width:1%}
+tr.now td{background:var(--nowBg)}
+tr.today td{background:var(--nowBg)}
+.seg{display:flex;background:var(--card2);border-radius:12px;padding:4px;margin:8px 0}
+.seg button{flex:1;background:none;border:0;color:var(--muted);padding:9px;border-radius:9px;font:inherit}
+.seg button.on{background:var(--accent);color:var(--onaccent);font-weight:600}
+ul{margin:6px 0;padding-left:20px}
+li{margin:4px 0}
+textarea{width:100%;min-height:80px;background:var(--card2);color:var(--text);border:1px solid var(--line);
+  border-radius:10px;padding:10px;font:inherit;resize:vertical}
+.btn{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:inherit}
+.btn.danger{color:var(--warn);border-color:var(--warn)}
+.week{display:flex;gap:6px;align-items:flex-end;height:90px;margin-top:8px}
+.week div{flex:1;text-align:center;font-size:11px;color:var(--muted)}
+.week i{display:block;background:var(--ok);border-radius:6px 6px 0 0;min-height:3px}
+.week .tdy i{background:var(--accent)}
+.note{border-left:3px solid var(--warn);padding:8px 12px;background:var(--noteBg);border-radius:0 10px 10px 0;margin:10px 0;font-size:14px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--navBg);border-top:1px solid var(--line);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:10}
+nav button{flex:1;background:none;border:0;color:var(--muted);padding:10px 2px 8px;font:inherit;font-size:12px}
+nav button span{display:block;font-size:20px;line-height:1.1}
+nav button.on{color:var(--accent)}
+</style>
+</head>
+<body>
+<header style="position:relative">
+  <button class="themebtn" id="themeBtn" aria-label="สลับโหมดสว่าง/มืด">☀️</button>
+  <h1>Daily Routine</h1>
+  <div class="sub" id="weekFocus"></div>
+</header>
+<main>
+
+<section id="tab-today" class="active">
+  <div class="datebar">
+    <button id="prev" aria-label="วันก่อนหน้า">◀</button>
+    <div class="d" id="dateLabel"></div>
+    <button id="next" aria-label="วันถัดไป">▶</button>
+  </div>
+  <div class="card">
+    <div class="stats">
+      <div class="stat"><b id="pct">0%</b><span>วันนี้</span></div>
+      <div class="stat"><b id="streak">0</b><span>วันติดต่อกัน</span></div>
+      <div class="stat"><b id="cnt">0/0</b><span>ทำแล้ว</span></div>
+    </div>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+  <div id="list"></div>
+  <h2>บันทึกวันนี้</h2>
+  <textarea id="noteBox" placeholder="ทำอะไรสำเร็จ พรุ่งนี้ต้องปรับอะไร"></textarea>
+  <div class="note" id="sleepNote"></div>
+</section>
+
+<section id="tab-schedule">
+  <div class="seg" id="schedSeg">
+    <button data-k="weekday" class="on">จันทร์-ศุกร์</button>
+    <button data-k="weekend">เสาร์-อาทิตย์</button>
+  </div>
+  <div class="card"><table id="schedTable"></table></div>
+</section>
+
+<section id="tab-workout">
+  <div class="card"><table id="workTable"></table></div>
+  <div class="card">
+    <h3>หลักการ</h3>
+    <ul>
+      <li>ทำ 3 เซ็ต เซ็ตละ 8-12 ครั้ง พัก 60-90 วินาที</li>
+      <li>เน้นฟอร์มก่อนน้ำหนัก ไม่มีอุปกรณ์ใช้น้ำหนักตัวได้</li>
+      <li>สัปดาห์ที่ 3 เป็นต้นไป เพิ่มน้ำหนักหรือจำนวนครั้งประมาณ 2.5-5%</li>
+      <li>เหนื่อยหรือเจ็บผิดปกติให้พัก ถ้ามีโรคประจำตัวหรืออาการบาดเจ็บ ควรปรึกษาแพทย์ก่อน</li>
+    </ul>
+  </div>
+  <h2>แบบฝึกการสื่อสาร (10 นาที)</h2>
+  <div class="card"><table id="talkTable"></table></div>
+</section>
+
+<section id="tab-rider">
+  <div class="card">
+    <h3>ช่วงรอออเดอร์ คือเวลาทอง</h3>
+    <ul>
+      <li>ยืดสะโพก ต้นขา หลังล่าง คอ ไหล่ 2-3 นาทีทุกครั้งที่จอดรอ</li>
+      <li>ฟังพอดแคสต์หรือหนังสือเสียงเฉพาะตอนจอด ไม่ใส่หูฟังตอนขี่</li>
+      <li>ฝึกพูดช้า ๆ ชัด ๆ ตอนคุยกับร้านและลูกค้า</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>อาหารและน้ำ</h3>
+    <ul>
+      <li>พกน้ำเปล่า 1.5-2 ลิตร</li>
+      <li>ของกินติดรถ: ไข่ต้ม กล้วย นมจืด ถั่ว</li>
+      <li>กินข้าวกล่องริมทาง ให้เพิ่มไข่หรืออกไก่เพื่อให้ได้โปรตีน</li>
+      <li>เลี่ยงของหวานและเครื่องดื่มชูกำลังหลัง 15:00</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>ความปลอดภัย</h3>
+    <ul>
+      <li>หมวกกันน็อกติดสายเสมอ ถุงมือ เสื้อกันฝนพร้อม</li>
+      <li>พักทุก 2-3 ชั่วโมง ถ้าง่วงให้จอดพักทันที ไม่ฝืน</li>
+      <li>คอ ไหล่ หลังล่างตึง ให้ยืดตอนเช้าและเย็น</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>ความนิ่ง</h3>
+    <ul>
+      <li>เจอลูกค้าหรือคนบนถนนใจร้อน หายใจลึก ๆ ไม่ตอบโต้</li>
+      <li>รับผิดชอบคำพูดและการกระทำ ผิดก็ยอมรับ แก้ไข แล้วไปต่อ</li>
+      <li>ไม่ข่มหรือดูถูกคนอื่น ความมั่นคงในตัวเองคือพลังที่แท้จริง</li>
+    </ul>
+  </div>
+  <div class="note">ถ้านอนไม่พอจนเพลีย ให้ตัดออกกำลังกายวันอังคารและพฤหัสฯ ก่อน ไม่ตัดการนอน</div>
+</section>
+
+<section id="tab-progress">
+  <div class="card">
+    <h3>7 วันล่าสุด</h3>
+    <div class="week" id="weekChart"></div>
+  </div>
+  <div class="card">
+    <h3>เป้าหมาย 4 สัปดาห์แรก</h3>
+    <table id="goalTable"></table>
+  </div>
+  <div class="card">
+    <h3>ข้อมูลของคุณ</h3>
+    <p class="sub">ข้อมูลเก็บในเครื่องนี้เท่านั้น แนะนำให้สำรองไว้เป็นระยะ</p>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn" id="exportBtn">สำรองข้อมูล</button>
+      <button class="btn" id="importBtn">นำเข้า</button>
+      <button class="btn danger" id="resetDayBtn">ล้างเช็กลิสต์วันนี้</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" hidden>
+  </div>
+</section>
+
+</main>
+
+<nav>
+  <button data-tab="today" class="on"><span>✅</span>วันนี้</button>
+  <button data-tab="schedule"><span>🕒</span>ตาราง</button>
+  <button data-tab="workout"><span>💪</span>ฝึก</button>
+  <button data-tab="rider"><span>🏍️</span>ไรเดอร์</button>
+  <button data-tab="progress"><span>📈</span>ผลลัพธ์</button>
+</nav>
+
+<script>
+/* ---------- ข้อมูลโปรแกรม (แก้ไขตรงนี้ได้เลย) ---------- */
+const SCHEDULE = {
+  weekday: [
+    ["05:45","ตื่น ดื่มน้ำ 1 แก้ว ล้างหน้า"],
+    ["06:00","ออกกำลังกาย 35 นาทีที่บ้าน (ดูแท็บ ฝึก)"],
+    ["06:35","อาบน้ำ แต่งตัวสะอาด"],
+    ["07:00","อาหารเช้าโปรตีนสูง (ไข่ นม โยเกิร์ต)"],
+    ["07:15","เดินทางไปทำงาน"],
+    ["08:00","งานประจำ ทำงานยากก่อน พักเที่ยวเดิน 10 นาที"],
+    ["16:30","กลับบ้าน กินข้าวเย็นก่อนออกรอบ พักสายตา 15 นาที"],
+    ["18:00","ไรเดอร์"],
+    ["21:00","กลับบ้าน"],
+    ["21:30","อาบน้ำ เขียนเป้าหมายพรุ่งนี้ 3 ข้อ"],
+    ["21:45","ผ่อนคลายหน้าคอม 1 ชม."],
+    ["22:45","วางจอ เตรียมนอน"],
+    ["23:00","นอน"]
+  ],
+  weekend: [
+    ["05:30","ตื่น ดื่มน้ำ ยืดเหยียด 10 นาที กินเช้า เตรียมน้ำและของกินติดรถ"],
+    ["06:00","ไรเดอร์ (พักยืดเหยียดทุก 2-3 ชม. และกินมื้อกลางวันจริงจัง)"],
+    ["20:00","เลิกรอบ กลับบ้าน"],
+    ["20:30","อาบน้ำ กินข้าว"],
+    ["21:00","ผ่อนคลายหน้าคอม 1 ชม."],
+    ["22:00","ทบทวนสัปดาห์ (อาทิตย์) วางแผนสัปดาห์หน้า"],
+    ["22:30","นอน"]
+  ]
+};
+
+const WORKOUT = {
+  1:["จันทร์","35 นาที","สควอต, วิดพื้น, โรว์ (ดัมเบลหรือยางยืด), แพลงก์"],
+  2:["อังคาร","15 นาที","เดินเร็ว + ยืดสะโพก หลัง ขา"],
+  3:["พุธ","35 นาที","รอมาเนียนเดดลิฟต์, โอเวอร์เฮดเพรส, ลันจ์, ไบเซ็ป/ไตรเซ็ป"],
+  4:["พฤหัสฯ","15 นาที","เดินเร็ว + ยืดเหยียด"],
+  5:["ศุกร์","35 นาที","ทำซ้ำวันจันทร์ เพิ่มน้ำหนักหรือจำนวนครั้ง"],
+  6:["เสาร์","20 นาที (ถ้าไหว)","วงจรเบา: สควอต วิดพื้น ลันจ์ แพลงก์ ทำต่อเนื่อง 4 รอบ"],
+  0:["อาทิตย์","พัก","ยืดเหยียดอย่างเดียว"]
+};
+
+const TALK = {
+  1:"ยืนหน้ากระจก พูดแนะนำตัว 1 นาที ช้า ๆ ชัด ๆ",
+  2:"อัดเสียงเล่าเรื่องวันนี้ ฟังย้อนหลังแล้วนับคำว่า \"เอ่อ\"",
+  3:"ทักทายคนใหม่ 1 คน มองตา ถามคำถามปลายเปิด",
+  4:"ฝึกปฏิเสธสุภาพ เช่น \"ขอบคุณครับ แต่ตอนนี้ผมไม่สะดวก\"",
+  5:"แสดงความเห็นในที่ประชุมหรือกลุ่ม อย่างน้อย 1 ครั้ง",
+  6:"ใช้เวลากับเพื่อนหรือครอบครัว ตั้งใจฟังโดยไม่เล่นมือถือ",
+  0:"ทบทวนสัปดาห์นี้ว่าพูดดีตรงไหน ต้องปรับอะไร"
+};
+
+const GOALS = [
+  ["สัปดาห์ 1","สร้างนิสัย","ตื่นเวลาเดิม, ออกกำลังกายครบ 3 ครั้ง, นอนให้พอ"],
+  ["สัปดาห์ 2","เพิ่มความต่อเนื่อง","ออกกำลังกายครบ 4 ครั้ง, เริ่มจดบันทึกประจำวัน"],
+  ["สัปดาห์ 3","เพิ่มความท้าทาย","เพิ่มน้ำหนัก 2.5-5%, ฝึกพูดต่อหน้าคนอื่น"],
+  ["สัปดาห์ 4","ประเมินผล","ถ่ายรูป/ชั่งน้ำหนักเทียบสัปดาห์แรก, ตั้งเป้าเดือนถัดไป"]
+];
+
+/* เช็กลิสต์รายวัน */
+function checklistFor(date){
+  const dow = date.getDay();
+  const wk = dow>=1 && dow<=5;
+  const w = WORKOUT[dow];
+  const items = [];
+  if(wk){
+    items.push({id:"wake",t:"ตื่น 05:45 ตรงเวลา ดื่มน้ำ 1 แก้ว"});
+    items.push({id:"workout",t:"ออกกำลังกาย: "+w[2],s:w[1]});
+    items.push({id:"breakfast",t:"อาหารเช้าโปรตีนสูง"});
+    items.push({id:"hardtask",t:"ทำงานที่ยากที่สุดก่อนเป็นอย่างแรก"});
+    items.push({id:"dinner",t:"กินข้าวเย็นก่อนออกรอบไรเดอร์"});
+  }else{
+    items.push({id:"wake",t:"ตื่น 05:30 ดื่มน้ำ ยืดเหยียด 10 นาที"});
+    items.push({id:"breakfast",t:"กินเช้า เตรียมน้ำและของกินติดรถ"});
+    items.push({id:"lunch",t:"กินมื้อกลางวันจริงจัง ไม่ข้าม"});
+    if(dow===6) items.push({id:"workout",t:"ออกกำลังกายเบา: "+w[2],s:w[1]+" (ข้ามได้ถ้าเพลียมาก)"});
+    else items.push({id:"workout",t:"วันพัก: ยืดเหยียดอย่างเดียว"});
+  }
+  items.push({id:"water",t:"ดื่มน้ำเปล่าให้ถึง 1.5-2 ลิตร"});
+  items.push({id:"stretch",t:"ยืดสะโพก หลัง คอ ไหล่ ระหว่างรอออเดอร์"});
+  items.push({id:"safe",t:"ขี่ปลอดภัย หมวกติดสาย ไม่ใส่หูฟังตอนขี่ ง่วงแล้วจอดพัก"});
+  items.push({id:"calm",t:"ไม่ระเบิดอารมณ์ใส่ใคร ใจร้อนก็หายใจลึก ๆ"});
+  items.push({id:"talk",t:"ฝึกสื่อสาร 10 นาที",s:TALK[dow]});
+  items.push({id:"skill",t:"พัฒนาทักษะอย่างน้อย 15 นาที (ฟัง/อ่าน/เรียน)",s:"ฟังตอนจอดรอได้"});
+  items.push({id:"relax",t:"ผ่อนคลายหน้าคอม 1 ชม. (พักจริง ๆ ไม่ต้องรู้สึกผิด)"});
+  if(wk) items.push({id:"goals",t:"เขียนเป้าหมายพรุ่งนี้ 3 ข้อ"});
+  if(dow===0) items.push({id:"review",t:"ทบทวนสัปดาห์และวางแผนสัปดาห์หน้า"});
+  items.push({id:"sleep",t:wk?"นอนไม่เกิน 23:00":"นอนไม่เกิน 22:30"});
+  return items;
+}
+
+/* ---------- ระบบ ---------- */
+const KEY = "daily-routine-v1";
+const $ = s => document.querySelector(s);
+const THDAY = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+const THMON = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+
+function key(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function load(){
+  try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; }
+}
+let state = load();
+state.days = state.days || {};
+state.notes = state.notes || {};
+if(!state.start) state.start = key(new Date());
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+save();
+
+let view = new Date(); view.setHours(12,0,0,0);
+let schedKind = null;
+
+function pctFor(d){
+  const items = checklistFor(d);
+  const done = state.days[key(d)] || {};
+  const n = items.filter(i => done[i.id]).length;
+  return {n, total: items.length, pct: Math.round(n*100/items.length)};
+}
+
+function streak(){
+  let d = new Date(); d.setHours(12,0,0,0);
+  if(pctFor(d).pct < 70) d.setDate(d.getDate()-1);
+  let c = 0;
+  while(pctFor(d).pct >= 70 && c < 3650){ c++; d.setDate(d.getDate()-1); }
+  return c;
+}
+
+function renderToday(){
+  const k = key(view);
+  const today = key(new Date());
+  $("#dateLabel").textContent = THDAY[view.getDay()]+" "+view.getDate()+" "+THMON[view.getMonth()]+(k===today?" (วันนี้)":"");
+  const items = checklistFor(view);
+  const done = state.days[k] || {};
+  const list = $("#list");
+  list.innerHTML = "";
+  items.forEach(it => {
+    const el = document.createElement("div");
+    el.className = "item"+(done[it.id]?" done":"");
+    const box = document.createElement("div"); box.className="box"; box.textContent = done[it.id]?"✓":"";
+    const t = document.createElement("div"); t.className="t"; t.textContent = it.t;
+    if(it.s){ const s=document.createElement("small"); s.textContent = it.s; t.appendChild(s); }
+    el.appendChild(box); el.appendChild(t);
+    el.addEventListener("click", () => {
+      state.days[k] = state.days[k] || {};
+      state.days[k][it.id] = !state.days[k][it.id];
+      save(); renderToday(); renderProgress();
+    });
+    list.appendChild(el);
+  });
+  const p = pctFor(view);
+  $("#pct").textContent = p.pct+"%";
+  $("#cnt").textContent = p.n+"/"+p.total;
+  $("#barfill").style.width = p.pct+"%";
+  $("#streak").textContent = streak();
+  $("#noteBox").value = state.notes[k] || "";
+  const wk = view.getDay()>=1 && view.getDay()<=5;
+  $("#sleepNote").textContent = wk
+    ? "วันธรรมดานอนได้ราว 6 ชม. 45 นาที ถ้าเพลีย ให้ลดเวลาคอมเหลือ 30 นาทีแล้วนอน 22:30 การนอนสำคัญกว่าทุกอย่างในตาราง"
+    : "สุดสัปดาห์ขี่ทั้งวัน พักทุก 2-3 ชม. และกินน้ำให้พอ ง่วงเมื่อไรให้จอดพักทันที";
+}
+
+function startMinutes(t){ const m = t.match(/(\d\d):(\d\d)/); return m ? (+m[1])*60+(+m[2]) : 0; }
+
+function renderSchedule(){
+  const now = new Date();
+  const dow = now.getDay();
+  const isWk = dow>=1 && dow<=5;
+  if(!schedKind) schedKind = isWk ? "weekday" : "weekend";
+  document.querySelectorAll("#schedSeg button").forEach(b => b.classList.toggle("on", b.dataset.k===schedKind));
+  const rows = SCHEDULE[schedKind];
+  const showNow = (schedKind==="weekday")===isWk;
+  const cur = now.getHours()*60+now.getMinutes();
+  let idx = -1;
+  if(showNow) rows.forEach((r,i) => { if(startMinutes(r[0]) <= cur) idx = i; });
+  const tb = $("#schedTable");
+  tb.innerHTML = "";
+  rows.forEach((r,i) => {
+    const tr = document.createElement("tr");
+    if(i===idx) tr.className = "now";
+    const a = document.createElement("td"); a.className="tm"; a.textContent = r[0];
+    const b = document.createElement("td"); b.textContent = r[1];
+    tr.appendChild(a); tr.appendChild(b); tb.appendChild(tr);
+  });
+}
+
+function renderWorkout(){
+  const todayDow = new Date().getDay();
+  const tb = $("#workTable");
+  tb.innerHTML = "<tr><th>วัน</th><th>เวลา</th><th>โปรแกรม</th></tr>";
+  [1,2,3,4,5,6,0].forEach(d => {
+    const w = WORKOUT[d];
+    const tr = document.createElement("tr");
+    if(d===todayDow) tr.className = "today";
+    w.forEach(c => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+  const tt = $("#talkTable");
+  tt.innerHTML = "";
+  [1,2,3,4,5,6,0].forEach(d => {
+    const tr = document.createElement("tr");
+    if(d===todayDow) tr.className = "today";
+    const a = document.createElement("td"); a.className="tm"; a.textContent = THDAY[d].replace("บดี","");
+    const b = document.createElement("td"); b.textContent = TALK[d];
+    tr.appendChild(a); tr.appendChild(b); tt.appendChild(tr);
+  });
+}
+
+function renderProgress(){
+  const chart = $("#weekChart");
+  chart.innerHTML = "";
+  const base = new Date(); base.setHours(12,0,0,0);
+  for(let i=6;i>=0;i--){
+    const d = new Date(base); d.setDate(d.getDate()-i);
+    const p = pctFor(d).pct;
+    const col = document.createElement("div");
+    if(i===0) col.className = "tdy";
+    const bar = document.createElement("i"); bar.style.height = Math.max(3,p*0.6)+"px";
+    col.appendChild(bar);
+    col.appendChild(document.createTextNode(p+"%"));
+    col.appendChild(document.createElement("br"));
+    col.appendChild(document.createTextNode(THDAY[d.getDay()].slice(0,3)));
+    chart.appendChild(col);
+  }
+  const s = new Date(state.start+"T12:00:00");
+  const diff = Math.floor((base - s)/86400000);
+  const wk = Math.floor(diff/7)+1;
+  $("#weekFocus").textContent = wk<=4
+    ? "สัปดาห์ที่ "+wk+": "+GOALS[wk-1][1]+" — "+GOALS[wk-1][2]
+    : "ผ่าน 4 สัปดาห์แรกแล้ว (สัปดาห์ที่ "+wk+") ตั้งเป้าเดือนถัดไปได้เลย";
+  const g = $("#goalTable");
+  g.innerHTML = "";
+  GOALS.forEach((r,i) => {
+    const tr = document.createElement("tr");
+    if(i===wk-1) tr.className = "today";
+    r.forEach(c => { const td = document.createElement("td"); td.textContent = c; tr.appendChild(td); });
+    g.appendChild(tr);
+  });
+}
+
+/* ---------- เหตุการณ์ ---------- */
+document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x===b));
+  document.querySelectorAll("section").forEach(s => s.classList.toggle("active", s.id==="tab-"+b.dataset.tab));
+  window.scrollTo(0,0);
+  if(b.dataset.tab==="schedule") renderSchedule();
+}));
+document.querySelectorAll("#schedSeg button").forEach(b => b.addEventListener("click", () => { schedKind = b.dataset.k; renderSchedule(); }));
+$("#prev").addEventListener("click", () => { view.setDate(view.getDate()-1); renderToday(); });
+$("#next").addEventListener("click", () => { view.setDate(view.getDate()+1); renderToday(); });
+$("#noteBox").addEventListener("input", e => { state.notes[key(view)] = e.target.value; save(); });
+$("#resetDayBtn").addEventListener("click", () => {
+  if(confirm("ล้างเช็กลิสต์ของวันที่กำลังดูอยู่?")){ delete state.days[key(view)]; save(); renderToday(); renderProgress(); }
+});
+$("#exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "routine-backup-"+key(new Date())+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+});
+$("#importBtn").addEventListener("click", () => $("#importFile").click());
+$("#importFile").addEventListener("change", e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const d = JSON.parse(r.result);
+      if(!d || typeof d.days!=="object") throw new Error("bad");
+      state = d; state.days = state.days||{}; state.notes = state.notes||{}; state.start = state.start||key(new Date());
+      save(); renderToday(); renderProgress(); alert("นำเข้าสำเร็จ");
+    }catch(err){ alert("ไฟล์ไม่ถูกต้อง"); }
+  };
+  r.readAsText(f);
+});
+
+function setTheme(t, persist){
+  document.documentElement.setAttribute("data-theme", t);
+  if(persist){ try{ localStorage.setItem("daily-routine-theme", t); }catch(e){} }
+  const m = document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute("content", t==="light" ? "#f4f6f8" : "#0f1419");
+  $("#themeBtn").textContent = t==="light" ? "🌙" : "☀️";
+}
+setTheme(document.documentElement.getAttribute("data-theme")==="light" ? "light" : "dark", false);
+$("#themeBtn").addEventListener("click", () => {
+  setTheme(document.documentElement.getAttribute("data-theme")==="light" ? "dark" : "light", true);
+});
+
+renderToday(); renderSchedule(); renderWorkout(); renderProgress();
+
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+  navigator.serviceWorker.register("sw.js").catch(function(){});
+}
+</script>
+</body>
+</html>
